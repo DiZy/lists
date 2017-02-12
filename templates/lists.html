@@ -7,10 +7,8 @@
 	</div>
 
 	<div class="container">
-	<ul id='items'>
-		<div class="item">Yogurt</div>
-		<div class="item">Milk</div>
-	</ul>
+	<div id='items'>
+	</div>
 	</div>
 
 	<script>
@@ -65,14 +63,17 @@
 				}
 				
 			}
-			
+
 			var lists;
 			getAllLists(function(output){
 				lists = output;
 			});
-			console.log(lists);
-			addSelectOptions(lists);
-			list.initialize(JSON.parse(lists[currentChoice]));
+			if(lists && lists.length > 0){
+				console.log(lists);
+				addSelectOptions(lists);
+				list.initialize(JSON.parse(lists[currentChoice]));
+			}
+
 
 			var handleSearch = function() {
 				console.log('input');

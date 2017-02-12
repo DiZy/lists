@@ -1,8 +1,8 @@
-item = function() {
+var item = function() {
 	var _itemJson;
 
 	function render() {
-		var div = $('<div>').addClass('item').text(_itemJson['text']).appendTo('.items');
+		var div = $('<div>').addClass('item').text(_itemJson.text).appendTo('#items');
 	}
 
 	function remove(thisItem) {

@@ -5,6 +5,7 @@ import uuid
 from utils import *
 from pymongo import MongoClient
 from bson import json_util
+import json as python_json
 
 app = Flask(__name__)
 app.secret_key = 'listsapp'
@@ -63,8 +64,10 @@ def getListItems():
 	if logged_in() == False:
 		return json.jsonify(status="error", error="not logged in")
 	listId = request.form.get('listId')
+	if listId is None:
+		return json.jsonify(status="error", error="no list")
 	user = users.find_one({'username':session['username']})
-	allItems = items.find({'listId': listId, 'userId': user['_id']})
+	allItems = items.find({'listId': listId})
 	json_docs = []
 	for doc in allItems:
 		json_doc = json_util.dumps(doc)
@@ -77,18 +80,22 @@ def addList():
 		return json.jsonify(status="error", error="not logged in")
 	listText = request.form.get('listText')
 	user = users.find_one({'username':session['username']})
-	new_id = listsCollection.insert({"_id": uuid.uuid4(), 'text': listText, 'userId': user['_id']})
+	new_id = listsCollection.insert({"_id": str(uuid.uuid4()), 'text': listText, 'userId': user['_id']})
 	return json.jsonify(status="success", new_id=json_util.dumps(new_id))
 
 @app.route('/addItem', methods=['POST'])
 def addItem():
 	if logged_in() == False:
 		return json.jsonify(status="error", error="not logged in")
+	print request.form.keys()
 	listId = request.form.get('listId')
+	if listId is None:
+		return json.jsonify(status="error", error="no list")
+	print listId
 	listName = request.form.get('listName')
 	itemText = request.form.get('itemText')
 	user = users.find_one({'username':session['username']})
-	new_id = items.insert({"_id": uuid.uuid4(), 'listId':listId, 'userId': user['_id'],'text': itemText, 'listName': listName})
+	new_id = items.insert({"_id": str(uuid.uuid4()), 'listId':listId, 'userId': user['_id'],'text': itemText, 'listName': listName}, check_keys=False)
 	new_item = items.find_one({'_id':new_id})
 	return json.jsonify(status="success", new_id=json_util.dumps(new_item))
 
@@ -144,7 +151,7 @@ def signUp():
 
 	password = make_pw_hash(username,password)
 	
-	user_id = users.insert({"_id": uuid.uuid4(), "username": username,"password": password,"name":full_name,'email':email})
+	user_id = users.insert({"_id": str(uuid.uuid4()), "username": username,"password": password,"name":full_name,'email':email})
 	session_login(username, full_name)
 	return json.jsonify(status="success")
 
