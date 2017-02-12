@@ -1,8 +1,10 @@
 from flask import Flask, render_template, request, redirect, json
 import jinja2
 import os
+import uuid
 from utils import *
 from pymongo import MongoClient
+from bson import json_util
 
 app = Flask(__name__)
 app.secret_key = 'listsapp'
@@ -10,7 +12,7 @@ app.secret_key = 'listsapp'
 client = MongoClient(os.environ['MONGO_URL'])
 db = client.listsapp
 users = db.Users
-lists = db.Lists
+listsCollection = db.Lists
 items = db.Items
 
 @app.errorhandler(404)
@@ -40,10 +42,42 @@ def hello():
 
 @app.route('/lists')
 def lists():
-	print logged_in();
 	if logged_in() == False:
 		return redirect('/')
 	return render_template("lists.html")
+
+@app.route('/getLists', methods=['POST'])
+def getLists():
+	user = users.find_one({'username':session['username']})
+	print('id:' + str(user['_id']))
+	allLists = listsCollection.find({'userId': user['_id']})
+	# print('ALL LISTS: ' + json_util.dumps(allLists))
+	json_docs = []
+	for doc in allLists:
+		json_doc = json_util.dumps(doc)
+		json_docs.append(json_doc)
+	# return json_util.dumps("{list:" + str(json_docs) + "}")
+	return json_util.dumps(json_docs)
+
+
+@app.route('/addList', methods=['POST'])
+def addList():
+	if logged_in() == False:
+		return json.jsonify(status="error", error="not logged in")
+	listText = request.form.get('listText')
+	user = users.find_one({'username':session['username']})
+	new_id = listsCollection.insert({"_id": uuid.uuid4(), 'text': listText, 'userId': user['_id']})
+	return json.jsonify(status="success", new_id=str(new_id))
+
+@app.route('/addItem', methods=['POST'])
+def addItem():
+	if logged_in() == False:
+		return json.jsonify(status="error", error="not logged in")
+	listId = request.form.get('listId')
+	itemText = request.form.get('itemText')
+	user = users.find_one({'username':session['username']})
+	new_id = items.insert({"_id": uuid.uuid4(), 'listId':listId, 'userId': user['_id'],'text': itemText})
+	return json.jsonify(status="success", new_id=new_id)
 
 @app.route('/removeItem', methods=['POST'])
 def removeItem():
@@ -96,7 +130,7 @@ def signUp():
 
 	password = make_pw_hash(username,password)
 	
-	user_id = users.insert({"username": username,"password": password,"name":full_name,'email':email})
+	user_id = users.insert({"_id": uuid.uuid4(), "username": username,"password": password,"name":full_name,'email':email})
 	session_login(username, full_name)
 	return json.jsonify(status="success")
 

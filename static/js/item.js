@@ -2,10 +2,10 @@ item = function() {
 	var _itemJson;
 
 	function render() {
-
+		var div = $('<div>').addClass('item').text(_itemJson['text']).appendTo('.items');
 	}
 
-	function remove(this) {
+	function remove(thisItem) {
 		//make remove request
 		var itemId = _itemJson.get('_id');
 		var removed = false;
@@ -21,7 +21,7 @@ item = function() {
 		            }
 		});
 		if(removed){
-			this.remove();	
+			thisItem.remove();	
 		}
 		else {
 			alert('Item remove error');

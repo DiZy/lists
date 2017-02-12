@@ -6,11 +6,12 @@ list = (function() {
 	}
 
 	function addListItems() {
-		var listItems = getListItems();
-		for(var itemJson : listItems) {
-			var item = new item();
-			item.initialize(itemJson);
-		}
+		// var listItems = getListItems();
+		// console.log(listItems);
+		// for(var itemJson : listItems) {
+		// 	var item = new item();
+		// 	item.initialize(itemJson);
+		// }
 	}
 
 	function getListItems() {
@@ -19,9 +20,18 @@ list = (function() {
 
 	return {
 		initialize: function(boardId) {
+			console.log(boardId);
 			_boardId = boardId;
 			removeExisting();
 			addListItems();
+
+		},
+		addNewItem: function(text) {
+			if(!_boardId){
+				console.log('no board loaded');
+				return;
+			}
+			console.log("adding: " + text);
 
 		}
 	}

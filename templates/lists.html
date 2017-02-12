@@ -18,6 +18,50 @@
 
 	<script>
 		$(document).ready(function(){
+
+			var currentChoice = 0;
+
+			function createListRequest(newText) {
+				$.ajax({
+				            type: "POST",
+				            url: '/addList',
+				            data: {
+				            	'listText':newText
+			        		},
+				            success: function(data){
+				            	if(data['status'] == 'success'){
+				            		console.log('added new list: ' + newText)
+				            	}
+				            	else {
+				            		alert(data['error']);
+				            	}
+				            },
+				            error: function(data){
+				            	alert('internal server error');
+				            }
+				});
+			}
+
+			function getAllLists(handler) {
+				$.ajax({
+				            type: "POST",
+				            url: '/getLists',
+				            async: false,
+				            data: {
+			        		},
+				            success: function(data){
+				            	handler(JSON.parse(data));
+				            	
+				            },
+				            error: function(data){
+				            }
+				});
+			}
+
+			function addSelectOptions(listOfOptions) {
+
+			}
+
 			var handleSearch = function() {
 				console.log('input');
 				if($('.no-results').length > 0) {
@@ -30,8 +74,11 @@
 						addSpan.appendTo(addLink);
 
 						addOption.click(function() {
-							// $('.bs-searchbox>input').val('');
-							// $('.selectpicker').selectpicker('val', 'Mustard');
+							var newText = $('.bs-searchbox>input').val();
+							createListRequest(newText);
+							var newOption = $('<option>').text(newText);
+							$('.selectpicker').append(newOption);
+							$('.selectpicker').selectpicker('val', newText);
 							$('.selectpicker').selectpicker('refresh');
 						});
 					}
@@ -46,6 +93,13 @@
 					$('#create').remove();
 				}
 			});
+
+			var lists;
+			getAllLists(function(output){
+				lists = output;
+			});
+			addSelectOptions(lists);
+			list.initialize(JSON.parse(lists[currentChoice])._id);
 			
 		});
 		
