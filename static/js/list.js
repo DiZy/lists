@@ -1,5 +1,5 @@
 list = (function() {
-	var _boardId;
+	var _listJson;
 
 	function removeExisting() {
 		$('.item').remove();
@@ -24,7 +24,7 @@ list = (function() {
 		            url: '/getListItems',
 		            async: false,
 		            data: {
-		            	'listId':_boardId
+		            	'listId':_listJson._id
 	        		},
 		            success: function(data){
 		                 handler(JSON.parse(data));
@@ -36,8 +36,8 @@ list = (function() {
 	}
 
 	return {
-		initialize: function(boardId) {
-			_boardId = boardId;
+		initialize: function(listJson) {
+			_listJson = listJson;
 			removeExisting();
 			addListItems();
 

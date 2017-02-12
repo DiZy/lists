@@ -3,9 +3,6 @@
 {% block content %}
 	<div id="select-div">
 		<select class="selectpicker" data-live-search="true">
-			<option>Stop and shop</option>
-			<option>Whole foods</option>
-			<option>Trader joe's</option>
 		</select>
 	</div>
 
@@ -59,8 +56,23 @@
 			}
 
 			function addSelectOptions(listOfOptions) {
-
+				for(var i = 0; i < listOfOptions.length;i++){
+					var curJson = JSON.parse(listOfOptions[i]);
+					console.log(curJson);
+					var newOption = $('<option>').text(curJson.text).attr('id', i);
+					$('.selectpicker').append(newOption);
+					$('.selectpicker').selectpicker('refresh');
+				}
+				
 			}
+			
+			var lists;
+			getAllLists(function(output){
+				lists = output;
+			});
+			console.log(lists);
+			addSelectOptions(lists);
+			list.initialize(JSON.parse(lists[currentChoice]));
 
 			var handleSearch = function() {
 				console.log('input');
@@ -94,12 +106,10 @@
 				}
 			});
 
-			var lists;
-			getAllLists(function(output){
-				lists = output;
+			$('.selectpicker').change(function() {
+				var id = $(this).children(":selected").attr('id');
+				list.initialize(JSON.parse(lists[id]));
 			});
-			addSelectOptions(lists);
-			list.initialize(JSON.parse(lists[currentChoice])._id);
 			
 		});
 		

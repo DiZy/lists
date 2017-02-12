@@ -78,23 +78,26 @@ def addList():
 	listText = request.form.get('listText')
 	user = users.find_one({'username':session['username']})
 	new_id = listsCollection.insert({"_id": uuid.uuid4(), 'text': listText, 'userId': user['_id']})
-	return json.jsonify(status="success", new_id=str(new_id))
+	return json.jsonify(status="success", new_id=json_util.dumps(new_id))
 
 @app.route('/addItem', methods=['POST'])
 def addItem():
 	if logged_in() == False:
 		return json.jsonify(status="error", error="not logged in")
 	listId = request.form.get('listId')
+	listName = request.form.get('listName')
 	itemText = request.form.get('itemText')
 	user = users.find_one({'username':session['username']})
-	new_id = items.insert({"_id": uuid.uuid4(), 'listId':listId, 'userId': user['_id'],'text': itemText})
-	return json.jsonify(status="success", new_id=new_id)
+	new_id = items.insert({"_id": uuid.uuid4(), 'listId':listId, 'userId': user['_id'],'text': itemText, 'listName': listName})
+	new_item = items.find_one({'_id':new_id})
+	return json.jsonify(status="success", new_id=json_util.dumps(new_item))
 
 @app.route('/removeItem', methods=['POST'])
 def removeItem():
 	itemId = request.form.get('itemId')
-	items.delete_one({'_id': itemId})
-
+	deleted = items.delete_one({'_id': itemId})
+	#add actual check
+	return json.jsonify(status="success")
 
 @app.route('/logout')
 def logout():
@@ -133,7 +136,7 @@ def signUp():
 	result = users.find_one({"username":username})
 	email_result = users.find_one({"email":email})
 
-	#already a user or already a user
+	#already a user
 	if not result is None:
 			return json.jsonify(status="error", error="Username taken.")
 	if not email_result is None:
