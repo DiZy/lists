@@ -6,21 +6,37 @@ list = (function() {
 	}
 
 	function addListItems() {
-		// var listItems = getListItems();
-		// console.log(listItems);
-		// for(var itemJson : listItems) {
-		// 	var item = new item();
-		// 	item.initialize(itemJson);
-		// }
+		var listItems;
+		getListItems(function(output){
+			listItems = output;
+		});
+
+		console.log(listItems);
+		for(var i =0; i < listItems.length; i++) {
+			var item = new item();
+			item.initialize(JSON.parse(listItems[i]));
+		}
 	}
 
-	function getListItems() {
-		//create request
+	function getListItems(handler) {
+		$.ajax({
+		            type: "POST",
+		            url: '/getListItems',
+		            async: false,
+		            data: {
+		            	'listId':_boardId
+	        		},
+		            success: function(data){
+		                 handler(JSON.parse(data));
+		            },
+		            error: function(data){
+		            	alert('internal server error');
+		            }
+		});
 	}
 
 	return {
 		initialize: function(boardId) {
-			console.log(boardId);
 			_boardId = boardId;
 			removeExisting();
 			addListItems();

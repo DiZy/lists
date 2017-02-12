@@ -48,17 +48,28 @@ def lists():
 
 @app.route('/getLists', methods=['POST'])
 def getLists():
+	if logged_in() == False:
+		return json.jsonify(status="error", error="not logged in")
 	user = users.find_one({'username':session['username']})
-	print('id:' + str(user['_id']))
 	allLists = listsCollection.find({'userId': user['_id']})
-	# print('ALL LISTS: ' + json_util.dumps(allLists))
 	json_docs = []
 	for doc in allLists:
 		json_doc = json_util.dumps(doc)
 		json_docs.append(json_doc)
-	# return json_util.dumps("{list:" + str(json_docs) + "}")
 	return json_util.dumps(json_docs)
 
+@app.route('/getListItems', methods=['POST'])
+def getListItems():
+	if logged_in() == False:
+		return json.jsonify(status="error", error="not logged in")
+	listId = request.form.get('listId')
+	user = users.find_one({'username':session['username']})
+	allItems = items.find({'listId': listId, 'userId': user['_id']})
+	json_docs = []
+	for doc in allItems:
+		json_doc = json_util.dumps(doc)
+		json_docs.append(json_doc)
+	return json_util.dumps(json_docs)
 
 @app.route('/addList', methods=['POST'])
 def addList():
