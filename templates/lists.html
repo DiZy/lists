@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Lists{% endblock %}
+{% block content %}
+	<div id="select-div">
+		<select class="selectpicker" data-live-search="true">
+			<option>Stop and shop</option>
+			<option>Whole foods</option>
+			<option>Trader joe's</option>
+		</select>
+	</div>
+
+	<script>
+		$(document).ready(function(){
+			var handleSearch = function() {
+				console.log('input');
+				if($('.no-results').length > 0) {
+					if($('#create').length == 0) {
+						//add option to cretae
+						var dropdownMenu = $('.dropdown-menu .inner');
+						var addOption = $('<li>').attr('id', 'create').appendTo(dropdownMenu);
+						var addLink = $('<a>').appendTo(addOption);
+						var addSpan = $('<span>').addClass('text').text('CREATE THIS OPTION').appendTo(addLink);
+
+						addOption.click(function() {
+							$('.bs-searchbox>input').val('');
+							$('.selectpicker').selectpicker('refresh');
+						});
+					}
+				}
+				else {
+					$('#create').remove();
+				}
+			};
+			$('#select-div').click(function(){
+				$('.bs-searchbox>input').off('input', handleSearch).on('input', handleSearch);
+				if($('.no-results').length == 0) {
+					$('#create').remove();
+				}
+			});
+			
+		});
+		
+	</script>
+
+{% endblock %}

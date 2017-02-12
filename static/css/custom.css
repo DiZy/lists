@@ -5,3 +5,16 @@ h1{
 .center{
 	text-align: center;
 }
+
+.bootstrap-select{
+	width:100% !important;
+	/*height:75px;*/
+}
+
+.dropdown-toggle{
+	/*height:100%;*/
+	font-size:35px;
+}
+.no-results {
+	display: none;
+}
