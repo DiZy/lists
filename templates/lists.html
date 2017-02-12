@@ -9,6 +9,13 @@
 		</select>
 	</div>
 
+	<div class="container">
+	<ul id='items'>
+		<div class="item">Yogurt</div>
+		<div class="item">Milk</div>
+	</ul>
+	</div>
+
 	<script>
 		$(document).ready(function(){
 			var handleSearch = function() {
@@ -19,10 +26,12 @@
 						var dropdownMenu = $('.dropdown-menu .inner');
 						var addOption = $('<li>').attr('id', 'create').appendTo(dropdownMenu);
 						var addLink = $('<a>').appendTo(addOption);
-						var addSpan = $('<span>').addClass('text').text('CREATE THIS OPTION').appendTo(addLink);
+						var addSpan = $('<span>').addClass('text').text('CREATE THIS OPTION').css('color', 'red');
+						addSpan.appendTo(addLink);
 
 						addOption.click(function() {
-							$('.bs-searchbox>input').val('');
+							// $('.bs-searchbox>input').val('');
+							// $('.selectpicker').selectpicker('val', 'Mustard');
 							$('.selectpicker').selectpicker('refresh');
 						});
 					}
