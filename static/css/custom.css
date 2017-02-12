@@ -33,6 +33,11 @@ h1{
 	text-align:center;
 	display:block;
 }
+#signUpForm>.btn {
+	margin:auto;
+	text-align:center;
+	display:block;
+}
 .form-control {
 	width:250px;
 	margin:0 auto;
