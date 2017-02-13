@@ -49,6 +49,7 @@ list = (function(item) {
 		},
 		addNewItem: function(text) {
 			if(!_listJson){
+				alert('First, you must choose or create a list using the dropdown.')
 				console.log('no board loaded');
 				return;
 			}
