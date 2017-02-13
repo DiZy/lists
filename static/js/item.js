@@ -2,12 +2,18 @@ var item = function() {
 	var _itemJson;
 
 	function render() {
-		var div = $('<div>').addClass('item').text(_itemJson.text).appendTo('#items');
+		var div = $('<div>').addClass('item').appendTo('#items');
+		var text = $('<div>').addClass('col-xs-11').text(_itemJson.text).appendTo(div);
+		var removeButton = $('<div>').addClass('col-xs-1 remove-item').text('X').appendTo(div);
+
+		removeButton.click(function() {
+			remove(div);
+		});
+
 	}
 
 	function remove(thisItem) {
-		//make remove request
-		var itemId = _itemJson.get('_id');
+		var itemId = _itemJson._id;
 		var removed = false;
 		$.ajax({
 		            type: "POST",

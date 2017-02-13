@@ -7,8 +7,10 @@
 	</div>
 
 	<div class="container">
-	<div id='items'>
-	</div>
+		<div id='items'>
+		</div>
+		<input class="input form-control" id="new-item-input" placeholder="New item">
+		<button class="btn btn-default" id="new-item-button" style="display:none">Add</button>
 	</div>
 
 	<script>
@@ -16,7 +18,7 @@
 
 			var currentChoice = 0;
 
-			function createListRequest(newText) {
+			function createListAddRequest(newText) {
 				$.ajax({
 				            type: "POST",
 				            url: '/addList',
@@ -74,6 +76,8 @@
 				list.initialize(JSON.parse(lists[currentChoice]));
 			}
 
+			var curNext = lists.length;
+
 
 			var handleSearch = function() {
 				console.log('input');
@@ -88,11 +92,17 @@
 
 						addOption.click(function() {
 							var newText = $('.bs-searchbox>input').val();
-							createListRequest(newText);
-							var newOption = $('<option>').text(newText);
+							createListAddRequest(newText);
+
+							var newOption = $('<option>').text(newText).attr('id', curNext);
+							curNext++;
 							$('.selectpicker').append(newOption);
 							$('.selectpicker').selectpicker('val', newText);
+							getAllLists(function(output){
+								lists = output;
+							});
 							$('.selectpicker').selectpicker('refresh');
+							$('.selectpicker').change();
 						});
 					}
 				}
@@ -111,7 +121,22 @@
 				var id = $(this).children(":selected").attr('id');
 				list.initialize(JSON.parse(lists[id]));
 			});
+
+			$('#new-item-input').on('input', function() {
+				if($(this).val() != "") {
+					$('#new-item-button').show();
+				}else {
+					$('#new-item-button').hide();
+				}
+			});
 			
+			$('#new-item-button').click(function() {
+				list.addNewItem($('#new-item-input').val());
+				var id = $('.selectpicker').children(":selected").attr('id');
+				list.initialize(JSON.parse(lists[id]));
+				$('#new-item-input').val('')
+			});
+
 		});
 		
 	</script>

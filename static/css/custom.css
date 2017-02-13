@@ -38,12 +38,47 @@ h1{
 	text-align:center;
 	display:block;
 }
+#new-item-button {
+	margin:auto;
+	text-align:center;
+	display:block;
+}
 .form-control {
 	width:250px;
 	margin:0 auto;
 	margin-bottom: 15px;
+	max-width:100%;
+}
+
+#new-item-input {
+	width:100%;
+	float:left;
+	margin-top:5px;
+}
+
+#items {
+	width:100%;
+	float:left;
 }
 
 .item {
+	width:100%;
+	margin:0 auto;
+	margin-bottom: 25px;
+	max-width:100%;
+	font-size:25px;
+	float:left;
+}
+.item>.col-xs-11 {
+	padding-left:0;
+	padding-right:30px;
+}
+.item>.col-xs-1 {
+	padding-left: 0;
+	padding-right: 0;
+	text-align:right;
+}
 
+.item>.remove-item {
+	cursor: pointer;
 }

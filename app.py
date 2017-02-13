@@ -87,7 +87,6 @@ def addList():
 def addItem():
 	if logged_in() == False:
 		return json.jsonify(status="error", error="not logged in")
-	print request.form.keys()
 	listId = request.form.get('listId')
 	if listId is None:
 		return json.jsonify(status="error", error="no list")
