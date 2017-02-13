@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, json
+from flask import Flask, render_template, request, redirect
 import jinja2
 import os
 import uuid
@@ -6,6 +6,7 @@ from utils import *
 from pymongo import MongoClient
 from bson import json_util
 import json as python_json
+from flask import json as flask_json
 
 app = Flask(__name__)
 app.secret_key = 'listsapp'
@@ -50,7 +51,7 @@ def lists():
 @app.route('/getLists', methods=['POST'])
 def getLists():
 	if logged_in() == False:
-		return json.jsonify(status="error", error="not logged in")
+		return flask_json.jsonify(status="error", error="not logged in")
 	user = users.find_one({'username':session['username']})
 	allLists = listsCollection.find({'userId': user['_id']})
 	json_docs = []
@@ -62,10 +63,10 @@ def getLists():
 @app.route('/getListItems', methods=['POST'])
 def getListItems():
 	if logged_in() == False:
-		return json.jsonify(status="error", error="not logged in")
+		return flask_json.jsonify(status="error", error="not logged in")
 	listId = request.form.get('listId')
 	if listId is None:
-		return json.jsonify(status="error", error="no list")
+		return flask_json.jsonify(status="error", error="no list")
 	user = users.find_one({'username':session['username']})
 	allItems = items.find({'listId': listId})
 	json_docs = []
@@ -77,33 +78,33 @@ def getListItems():
 @app.route('/addList', methods=['POST'])
 def addList():
 	if logged_in() == False:
-		return json.jsonify(status="error", error="not logged in")
+		return flask_json.jsonify(status="error", error="not logged in")
 	listText = request.form.get('listText')
 	user = users.find_one({'username':session['username']})
 	new_id = listsCollection.insert({"_id": str(uuid.uuid4()), 'text': listText, 'userId': user['_id']})
-	return json.jsonify(status="success", new_id=json_util.dumps(new_id))
+	return flask_json.jsonify(status="success", new_id=json_util.dumps(new_id))
 
 @app.route('/addItem', methods=['POST'])
 def addItem():
 	if logged_in() == False:
-		return json.jsonify(status="error", error="not logged in")
+		return flask_json.jsonify(status="error", error="not logged in")
 	listId = request.form.get('listId')
 	if listId is None:
-		return json.jsonify(status="error", error="no list")
+		return flask_json.jsonify(status="error", error="no list")
 	print listId
 	listName = request.form.get('listName')
 	itemText = request.form.get('itemText')
 	user = users.find_one({'username':session['username']})
 	new_id = items.insert({"_id": str(uuid.uuid4()), 'listId':listId, 'userId': user['_id'],'text': itemText, 'listName': listName}, check_keys=False)
 	new_item = items.find_one({'_id':new_id})
-	return json.jsonify(status="success", new_id=json_util.dumps(new_item))
+	return flask_json.jsonify(status="success", new_id=json_util.dumps(new_item))
 
 @app.route('/removeItem', methods=['POST'])
 def removeItem():
 	itemId = request.form.get('itemId')
 	deleted = items.delete_one({'_id': itemId})
 	#add actual check
-	return json.jsonify(status="success")
+	return flask_json.jsonify(status="success")
 
 @app.route('/logout')
 def logout():
@@ -118,23 +119,23 @@ def signUp():
 	password = request.form.get('password')
 	password_confirm = request.form.get('password_confirm')
 	if not full_name:
-		return json.jsonify(status="error", error="Please enter a name.")
+		return flask_json.jsonify(status="error", error="Please enter a name.")
 	if not username:
-		return json.jsonify(status="error", error="Please enter a username.")
+		return flask_json.jsonify(status="error", error="Please enter a username.")
 	if not email:
-		return json.jsonify(status="error", error="Please enter an email.")
+		return flask_json.jsonify(status="error", error="Please enter an email.")
 	if not valid_email(email):
-		return json.jsonify(status="error", error="Please enter a valid email.")
+		return flask_json.jsonify(status="error", error="Please enter a valid email.")
 	if not password:
-		return json.jsonify(status="error", error="Please enter a password.")
+		return flask_json.jsonify(status="error", error="Please enter a password.")
 	if not password_confirm:
-		return json.jsonify(status="error", error="Please re-type your password.")
+		return flask_json.jsonify(status="error", error="Please re-type your password.")
 	if not valid_username(username):
-		return json.jsonify(status="error", error="Enter a valid username.")
+		return flask_json.jsonify(status="error", error="Enter a valid username.")
 	if not valid_password(password):
-		return json.jsonify(status="error", error="Enter a valid password.")
+		return flask_json.jsonify(status="error", error="Enter a valid password.")
 	if password != password_confirm:
-		return json.jsonify(status="error", error="Passwords must match")
+		return flask_json.jsonify(status="error", error="Passwords must match")
 
 	email = email.lower()
 	username = username.lower()
@@ -144,15 +145,15 @@ def signUp():
 
 	#already a user
 	if not result is None:
-			return json.jsonify(status="error", error="Username taken.")
+			return flask_json.jsonify(status="error", error="Username taken.")
 	if not email_result is None:
-		return json.jsonify(status="error", error="Email taken.")
+		return flask_json.jsonify(status="error", error="Email taken.")
 
 	password = make_pw_hash(username,password)
 	
 	user_id = users.insert({"_id": str(uuid.uuid4()), "username": username,"password": password,"name":full_name,'email':email})
 	session_login(username, full_name)
-	return json.jsonify(status="success")
+	return flask_json.jsonify(status="success")
 
 @app.route('/signIn', methods=['POST'])
 def signIn():
@@ -160,20 +161,20 @@ def signIn():
 	password = request.form.get('password')
 
 	if not(username):
-		return json.jsonify(error="No username given.", status="error")
+		return flask_json.jsonify(error="No username given.", status="error")
 	if not(password):
-		return json.jsonify(status="error", error="No password given.")
+		return flask_json.jsonify(status="error", error="No password given.")
 
 	username = username.lower()
 	user = users.find_one({'username':username})
 
 	if user is None:
-		return json.jsonify(status="error", error="No account found!")
+		return flask_json.jsonify(status="error", error="No account found!")
 	if not(valid_pw(username,password,user.get('password'))):
-		return json.jsonify(status="error", error="Invalid username or password.")
+		return flask_json.jsonify(status="error", error="Invalid username or password.")
 
 	session_login(username, user.get('name'))
-	return json.jsonify(status="success")
+	return flask_json.jsonify(status="success")
 
 if __name__ == '__main__':
 	port = int(os.environ.get('PORT', 8000))
